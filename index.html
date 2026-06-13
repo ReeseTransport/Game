@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Forza Horizon 6 — Japan (Fan Recreation)</title>
+  <link rel="stylesheet" href="./src/style.css" />
+  <!-- Three.js is vendored locally so the game is self-contained / works offline. -->
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "./vendor/three.module.js"
+    }
+  }
+  </script>
+</head>
+<body>
+  <!-- 3D render target -->
+  <canvas id="scene"></canvas>
+
+  <!-- Speed-blur / vignette overlay -->
+  <div id="speedlines"></div>
+  <div id="vignette"></div>
+
+  <!-- ===================== HUD ===================== -->
+  <div id="hud">
+    <!-- Top-left brand -->
+    <div id="brand">
+      <span class="brand-forza">FORZA</span>
+      <span class="brand-horizon">HORIZON</span>
+      <span class="brand-six">6</span>
+    </div>
+
+    <!-- Bottom-left minimap / radar -->
+    <div id="minimap-wrap">
+      <canvas id="minimap" width="320" height="320"></canvas>
+      <div id="radar-bar">
+        <span class="globe">&#9784;</span>
+        <span class="anna">ANNA</span>
+        <span class="link">LINK <b>&#9415;</b></span>
+      </div>
+    </div>
+
+    <!-- Bottom-right speedometer -->
+    <div id="speedo-wrap">
+      <canvas id="speedo" width="480" height="420"></canvas>
+    </div>
+
+    <!-- Bottom-center caption -->
+    <div id="footage">IN-GAME FOOTAGE</div>
+  </div>
+
+  <!-- ===================== Loading / Start ===================== -->
+  <div id="loader">
+    <div class="loader-inner">
+      <div class="loader-brand">
+        <span class="brand-forza">FORZA</span>
+        <span class="brand-horizon">HORIZON</span>
+        <span class="brand-six">6</span>
+      </div>
+      <div class="loader-sub">JAPAN &mdash; FAN RECREATION</div>
+
+      <div id="loader-progress"><div id="loader-bar"></div></div>
+      <div id="loader-status">Building world&hellip;</div>
+
+      <button id="start-btn" disabled>DRIVE</button>
+
+      <div class="controls">
+        <div><b>W</b> / <b>&#8593;</b> Accelerate &nbsp;&nbsp; <b>S</b> / <b>&#8595;</b> Brake / Reverse</div>
+        <div><b>A</b> <b>D</b> / <b>&#8592;</b> <b>&#8594;</b> Steer &nbsp;&nbsp; <b>Space</b> Handbrake</div>
+        <div><b>C</b> Camera &nbsp;&nbsp; <b>R</b> Reset &nbsp;&nbsp; <b>M</b> Mute &nbsp;&nbsp; <b>H</b> Hide HUD</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Touch controls (mobile) -->
+  <div id="touch">
+    <div class="touch-steer">
+      <button class="tbtn" data-key="left">&#8592;</button>
+      <button class="tbtn" data-key="right">&#8594;</button>
+    </div>
+    <div class="touch-pedals">
+      <button class="tbtn" data-key="brake">&#8595;</button>
+      <button class="tbtn" data-key="gas">&#8593;</button>
+    </div>
+  </div>
+
+  <script type="module" src="./src/main.js"></script>
+</body>
+</html>

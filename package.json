@@ -1,0 +1,22 @@
+{
+  "name": "forza-horizon-6-japan",
+  "version": "1.0.0",
+  "description": "A browser-based, Three.js fan recreation of the Forza Horizon 6 (Japan) reveal trailer.",
+  "scripts": {
+    "start": "node server.js",
+    "serve": "node server.js"
+  },
+  "keywords": [
+    "threejs",
+    "racing",
+    "game",
+    "forza",
+    "webgl"
+  ],
+  "license": "MIT",
+  "private": true,
+  "devDependencies": {
+    "playwright": "^1.56.0",
+    "three": "^0.160.0"
+  }
+}
