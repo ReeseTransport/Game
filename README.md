@@ -35,6 +35,17 @@ Then open **http://localhost:8080** and press **DRIVE**.
 > Fully self-contained / **works offline** — Three.js, the loaders and the car
 > model are all vendored in `vendor/` and `assets/`. No CDN, no internet needed.
 
+### ☁️ Deploy (optional)
+
+Zero-config static deploy — a `vercel.json` is included (no build step):
+
+```bash
+npx vercel deploy --prod   # from the repo root
+```
+
+…or connect the repo in the Vercel dashboard for git-push deploys. Any static
+host (GitHub Pages, Netlify, Cloudflare Pages) works too — just serve the repo root.
+
 ## 🎮 Controls
 
 | Action | Keys |
