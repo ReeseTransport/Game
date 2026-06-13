@@ -152,7 +152,10 @@ export class Car {
   }
 
   _applyModel(model) {
-    const bodyMat = new THREE.MeshStandardMaterial({ color: '#39414e', metalness: 0.86, roughness: 0.32, envMapIntensity: 1.5 });
+    const bodyMat = new THREE.MeshPhysicalMaterial({
+      color: '#39414e', metalness: 0.7, roughness: 0.28,
+      clearcoat: 1.0, clearcoatRoughness: 0.12, envMapIntensity: 1.4,
+    });
     const glassMat = new THREE.MeshStandardMaterial({ color: '#0e141b', metalness: 0.3, roughness: 0.06, envMapIntensity: 1.6, transparent: true, opacity: 0.62 });
     const detailMat = new THREE.MeshStandardMaterial({ color: '#cdd2d8', metalness: 0.95, roughness: 0.35, envMapIntensity: 1.2 });
 
@@ -213,6 +216,7 @@ export class Car {
     const gas = input.gas;
     const brake = input.brake;
     const hand = input.handbrake;
+    this.handbrakeOn = hand;
 
     // ---- longitudinal ----
     const movingFwd = this.speed > 0.2;

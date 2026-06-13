@@ -39,25 +39,46 @@ try {
   await page.waitForTimeout(1200);
   await page.screenshot({ path: SHOTS + '02-idle.png' });
 
-  // accelerate while the GLB streams in (headless SwiftShader runs in slow-motion,
-  // so we gate on state changes rather than wall-clock speed targets)
+  // accelerate while the GLB + HDRI stream in (headless SwiftShader runs in
+  // slow-motion, so we gate on state changes rather than wall-clock targets)
   await page.keyboard.down('w');
   const s1 = await page.evaluate(() => window.__fh6());
   let modelLoaded = false;
   try {
-    await page.waitForFunction(() => window.__fh6().usingModel === true, { timeout: 20000 });
+    await page.waitForFunction(() => window.__fh6().usingModel === true, { timeout: 25000 });
     modelLoaded = true;
   } catch { /* fall back path still valid */ }
-
-  await page.keyboard.down('d');
-  await page.waitForTimeout(1500);
-  await page.keyboard.up('d');
-  await page.waitForTimeout(1500);
+  await page.waitForTimeout(3000);
   await page.screenshot({ path: SHOTS + '03-driving.png' });
+
+  // steer LEFT, then RIGHT, capturing heading so we can confirm direction
+  await page.keyboard.down('a');
+  await page.waitForTimeout(1600);
+  const sL = await page.evaluate(() => window.__fh6());
+  await page.screenshot({ path: SHOTS + '05-steer-left.png' });
+  await page.keyboard.up('a');
+  await page.keyboard.down('d');
+  await page.waitForTimeout(1600);
+  const sR = await page.evaluate(() => window.__fh6());
+  await page.screenshot({ path: SHOTS + '06-steer-right.png' });
+  await page.keyboard.up('d');
+
+  // drift: handbrake + steer -> tyre smoke + skid marks
+  await page.keyboard.down('Space');
+  await page.keyboard.down('d');
+  await page.waitForTimeout(1800);
+  const sDrift = await page.evaluate(() => window.__fh6());
+  await page.screenshot({ path: SHOTS + '07-drift.png' });
+  await page.keyboard.up('Space');
+  await page.keyboard.up('d');
   const s2 = await page.evaluate(() => window.__fh6());
   await page.keyboard.up('w');
 
   log('state start  :', JSON.stringify(s1));
+  log('steer-left   : heading=' + sL.heading.toFixed(3));
+  log('steer-right  : heading=' + sR.heading.toFixed(3));
+  log('drift        : particles=' + sDrift.fxParticles + ' skidWrites=' + sDrift.skidWrites);
+  log('pipeline     : postfx=' + s2.postfx + ' hdri=' + s2.hdri);
   log('state driving:', JSON.stringify(s2));
   log('GLB model loaded:', modelLoaded);
 
@@ -77,6 +98,10 @@ try {
   if (!(s2.mph > 1)) fail.push('car did not accelerate (mph=' + s2.mph + ')');
   if (!(moved > 0.5)) fail.push('car did not move (moved=' + moved.toFixed(2) + ')');
   if (!Number.isFinite(s2.mph)) fail.push('mph not finite');
+  if (!s2.postfx) fail.push('post-processing pipeline not active');
+  if (!s2.hdri) fail.push('HDRI environment did not load');
+  if (!(sDrift.fxParticles > 0)) fail.push('drift produced no smoke/dust particles');
+  if (!(sDrift.skidWrites > 0)) fail.push('drift produced no skid marks');
 
   log('\nSCREENSHOTS:', SHOTS);
   log('CONSOLE/PAGE ERRORS:', errors.length);
