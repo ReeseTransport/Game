@@ -1,0 +1,319 @@
+/* ============================================================
+   Forza Horizon 6 — Japan (Fan Recreation)
+   Global + HUD styling
+   ============================================================ */
+
+:root {
+  --fh-magenta: #e6007e;
+  --fh-magenta-soft: #ff2ea0;
+  --fh-cyan: #00e5ff;
+  --hud-white: rgba(255, 255, 255, 0.95);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html, body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: #0a0d12;
+  font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+  color: #fff;
+  -webkit-user-select: none;
+  user-select: none;
+  touch-action: none;
+}
+
+#scene {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+/* ---------- Speed-blur lines + vignette overlays ---------- */
+#speedlines {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0;
+  background:
+    radial-gradient(ellipse 60% 60% at 50% 50%,
+      rgba(0,0,0,0) 35%,
+      rgba(255,255,255,0.05) 75%,
+      rgba(255,255,255,0.18) 100%);
+  mix-blend-mode: screen;
+  transition: opacity 0.25s ease;
+  z-index: 5;
+}
+
+#vignette {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(ellipse 75% 75% at 50% 48%,
+      rgba(0,0,0,0) 55%, rgba(0,0,0,0.42) 100%);
+  z-index: 6;
+}
+
+/* ====================== HUD ====================== */
+#hud {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 10;
+  opacity: 0;
+  transition: opacity 0.6s ease;
+}
+#hud.show { opacity: 1; }
+#hud.hidden { opacity: 0 !important; }
+
+/* ---------- Brand wordmark ---------- */
+.brand-forza, .brand-horizon, .brand-six {
+  font-family: "Arial Black", "Arial", sans-serif;
+  font-weight: 900;
+  letter-spacing: 0.04em;
+  line-height: 0.9;
+  text-transform: uppercase;
+}
+
+#brand {
+  position: absolute;
+  top: 26px;
+  left: 32px;
+  display: grid;
+  grid-template-columns: auto auto;
+  grid-template-rows: auto auto;
+  align-items: end;
+  column-gap: 10px;
+  filter: drop-shadow(0 2px 6px rgba(0,0,0,0.55));
+}
+#brand .brand-forza {
+  grid-column: 1;
+  grid-row: 1;
+  font-size: 22px;
+  letter-spacing: 0.32em;
+  font-weight: 800;
+  align-self: end;
+}
+#brand .brand-horizon {
+  grid-column: 1;
+  grid-row: 2;
+  font-size: 40px;
+  font-weight: 900;
+}
+#brand .brand-six {
+  grid-column: 2;
+  grid-row: 1 / span 2;
+  align-self: center;
+  font-size: 46px;
+  font-weight: 900;
+  color: #fff;
+  background: linear-gradient(160deg, var(--fh-magenta-soft), var(--fh-magenta));
+  border-radius: 12px;
+  padding: 2px 14px 6px;
+  box-shadow: 0 4px 14px rgba(230,0,126,0.45);
+}
+
+/* ---------- Minimap / radar ---------- */
+#minimap-wrap {
+  position: absolute;
+  left: 30px;
+  bottom: 30px;
+  width: 180px;
+  filter: drop-shadow(0 6px 16px rgba(0,0,0,0.5));
+}
+#minimap {
+  width: 160px;
+  height: 160px;
+  display: block;
+}
+#radar-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 6px;
+  padding-left: 4px;
+  font-size: 13px;
+  letter-spacing: 0.14em;
+  font-weight: 700;
+  color: var(--hud-white);
+  text-shadow: 0 1px 3px rgba(0,0,0,0.7);
+}
+#radar-bar .globe { color: var(--fh-cyan); font-size: 16px; }
+#radar-bar .anna { flex: 1; }
+#radar-bar .link {
+  opacity: 0.7;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+#radar-bar .link b { color: var(--fh-cyan); font-size: 16px; }
+
+/* ---------- Speedometer ---------- */
+#speedo-wrap {
+  position: absolute;
+  right: 18px;
+  bottom: 14px;
+  width: 320px;
+  height: 280px;
+  filter: drop-shadow(0 6px 16px rgba(0,0,0,0.45));
+}
+#speedo { width: 320px; height: 280px; display: block; }
+
+/* ---------- Caption ---------- */
+#footage {
+  position: absolute;
+  left: 50%;
+  bottom: 26px;
+  transform: translateX(-50%);
+  font-size: 15px;
+  letter-spacing: 0.34em;
+  font-weight: 600;
+  color: rgba(255,255,255,0.82);
+  text-shadow: 0 1px 4px rgba(0,0,0,0.7);
+}
+
+/* ====================== Loader ====================== */
+#loader {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background:
+    radial-gradient(circle at 50% 35%, #1b2433 0%, #0a0d12 70%);
+  transition: opacity 0.8s ease;
+}
+#loader.gone { opacity: 0; pointer-events: none; }
+
+.loader-inner { text-align: center; padding: 24px; max-width: 90vw; }
+
+.loader-brand {
+  display: inline-grid;
+  grid-template-columns: auto auto;
+  grid-template-rows: auto auto;
+  align-items: end;
+  column-gap: 14px;
+  margin-bottom: 6px;
+}
+.loader-brand .brand-forza { grid-column:1; grid-row:1; font-size: 30px; letter-spacing: 0.34em; align-self:end; }
+.loader-brand .brand-horizon { grid-column:1; grid-row:2; font-size: 64px; }
+.loader-brand .brand-six {
+  grid-column:2; grid-row:1 / span 2; align-self:center;
+  font-size: 64px;
+  background: linear-gradient(160deg, var(--fh-magenta-soft), var(--fh-magenta));
+  border-radius: 16px; padding: 4px 20px 10px;
+  box-shadow: 0 6px 20px rgba(230,0,126,0.5);
+}
+
+.loader-sub {
+  letter-spacing: 0.5em;
+  font-size: 14px;
+  color: rgba(255,255,255,0.55);
+  margin-bottom: 34px;
+}
+
+#loader-progress {
+  width: 320px;
+  max-width: 80vw;
+  height: 4px;
+  margin: 0 auto;
+  background: rgba(255,255,255,0.12);
+  border-radius: 4px;
+  overflow: hidden;
+}
+#loader-bar {
+  width: 0%;
+  height: 100%;
+  background: linear-gradient(90deg, var(--fh-cyan), var(--fh-magenta-soft));
+  transition: width 0.2s ease;
+}
+#loader-status {
+  margin-top: 14px;
+  font-size: 13px;
+  letter-spacing: 0.18em;
+  color: rgba(255,255,255,0.5);
+  min-height: 18px;
+}
+
+#start-btn {
+  margin-top: 30px;
+  font-family: "Arial Black", Arial, sans-serif;
+  font-weight: 900;
+  letter-spacing: 0.3em;
+  font-size: 20px;
+  color: #fff;
+  background: linear-gradient(160deg, var(--fh-magenta-soft), var(--fh-magenta));
+  border: none;
+  border-radius: 10px;
+  padding: 16px 54px;
+  cursor: pointer;
+  box-shadow: 0 8px 26px rgba(230,0,126,0.45);
+  transition: transform 0.15s ease, opacity 0.3s ease, box-shadow 0.2s ease;
+  opacity: 0.35;
+  pointer-events: none;
+}
+#start-btn.ready { opacity: 1; pointer-events: auto; }
+#start-btn.ready:hover { transform: translateY(-2px); box-shadow: 0 12px 32px rgba(230,0,126,0.6); }
+#start-btn:active { transform: translateY(1px); }
+
+.controls {
+  margin-top: 30px;
+  font-size: 13px;
+  line-height: 1.9;
+  color: rgba(255,255,255,0.55);
+  letter-spacing: 0.04em;
+}
+.controls b {
+  display: inline-block;
+  min-width: 20px;
+  padding: 1px 7px;
+  margin: 0 1px;
+  background: rgba(255,255,255,0.1);
+  border: 1px solid rgba(255,255,255,0.18);
+  border-radius: 5px;
+  color: #fff;
+  font-weight: 700;
+}
+
+/* ====================== Touch controls ====================== */
+#touch { display: none; }
+.touch-steer, .touch-pedals {
+  position: fixed;
+  bottom: 0; top: 0;
+  width: 50%;
+  pointer-events: none;
+  z-index: 20;
+}
+.tbtn {
+  position: absolute;
+  bottom: 28px;
+  width: 84px; height: 84px;
+  border-radius: 50%;
+  border: 2px solid rgba(255,255,255,0.3);
+  background: rgba(20,26,36,0.45);
+  color: #fff;
+  font-size: 34px;
+  pointer-events: auto;
+  backdrop-filter: blur(3px);
+}
+.tbtn:active { background: rgba(230,0,126,0.5); }
+.touch-steer .tbtn[data-key="left"]  { left: 24px; }
+.touch-steer .tbtn[data-key="right"] { left: 124px; }
+.touch-pedals .tbtn[data-key="brake"] { right: 124px; }
+.touch-pedals .tbtn[data-key="gas"]   { right: 24px; }
+
+body.touch #touch { display: block; }
+
+/* Smaller screens: scale HUD down */
+@media (max-width: 760px) {
+  #brand { transform: scale(0.7); transform-origin: top left; }
+  #speedo-wrap { transform: scale(0.78); transform-origin: bottom right; }
+  #minimap-wrap { transform: scale(0.82); transform-origin: bottom left; }
+  #footage { font-size: 12px; bottom: 14px; }
+}
