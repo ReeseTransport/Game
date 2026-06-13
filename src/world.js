@@ -20,25 +20,43 @@ export class World {
     this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     this.renderer.setSize(window.innerWidth, window.innerHeight);
     this.renderer.outputColorSpace = THREE.SRGBColorSpace;
-    this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    this.renderer.toneMappingExposure = 1.02;
+    this.renderer.toneMapping = THREE.AgXToneMapping;
+    this.renderer.toneMappingExposure = 1.0;
     this.renderer.shadowMap.enabled = true;
     this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
     this.scene = new THREE.Scene();
-    this.scene.fog = new THREE.Fog(FOG_COLOR, 400, 2400);
+    this.scene.fog = new THREE.Fog(FOG_COLOR, 420, 2600);
 
-    // neutral studio IBL so PBR paint / chrome reflect convincingly
-    const pmrem = new THREE.PMREMGenerator(this.renderer);
-    this.scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
+    // neutral studio IBL immediately; replaced by the HDRI sky once it streams in
+    this._pmrem = new THREE.PMREMGenerator(this.renderer);
+    this.scene.environment = this._pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
 
     this._buildSky();
     this._buildLights();
     this._buildGround();
     this._buildClouds();
     this._buildMountains();
+    this._loadHDRI();
 
     this.clock = new THREE.Clock();
+  }
+
+  // Real-sky HDRI for background + image-based lighting (CC0, Poly Haven).
+  async _loadHDRI() {
+    try {
+      const { RGBELoader } = await import('../vendor/jsm/loaders/RGBELoader.js');
+      const tex = await new RGBELoader().loadAsync('./assets/sky.hdr');
+      tex.mapping = THREE.EquirectangularReflectionMapping;
+      this.scene.environment = this._pmrem.fromEquirectangular(tex).texture;
+      this.scene.background = tex;
+      this.scene.backgroundIntensity = 1.05;
+      if (this._skyDome) this._skyDome.visible = false;
+      if (this._sunSprite) this._sunSprite.visible = false;
+      this.hdriLoaded = true;
+    } catch (e) {
+      console.warn('[world] HDRI load failed, using gradient sky:', (e && e.message) || e);
+    }
   }
 
   // ---- Sky dome with vertical gradient + sun glow ----
@@ -74,9 +92,10 @@ export class World {
           gl_FragColor = vec4(mix(bottomColor, topColor, t), 1.0);
         }`,
     });
-    this.scene.add(new THREE.Mesh(skyGeo, skyMat));
+    this._skyDome = new THREE.Mesh(skyGeo, skyMat);
+    this.scene.add(this._skyDome);
 
-    // Sun glow billboard high in the sky.
+    // Sun glow billboard high in the sky (hidden once the HDRI sun takes over).
     const sunMat = new THREE.SpriteMaterial({
       map: radialSprite('rgba(255,250,235,1)', 0.15),
       transparent: true,
@@ -84,10 +103,10 @@ export class World {
       blending: THREE.AdditiveBlending,
       fog: false,
     });
-    const sun = new THREE.Sprite(sunMat);
-    sun.scale.set(620, 620, 1);
-    sun.position.copy(SUN_DIR).multiplyScalar(2600);
-    this.scene.add(sun);
+    this._sunSprite = new THREE.Sprite(sunMat);
+    this._sunSprite.scale.set(620, 620, 1);
+    this._sunSprite.position.copy(SUN_DIR).multiplyScalar(2600);
+    this.scene.add(this._sunSprite);
   }
 
   // ---- Lighting ----

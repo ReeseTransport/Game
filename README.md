@@ -53,9 +53,14 @@ On touch devices, on-screen steering + pedal buttons appear automatically.
 ## ✨ What's recreated from the trailer
 
 - **Third-person chase cam** with speed-based FOV, body roll/pitch and subtle shake.
-- **A real 3D sports car** (Ferrari GLB) finished in gunmetal paint with a neutral
-  studio environment map for convincing reflections — with a hand-built
-  GT-R-Nismo-style coupe (quad round tail lights, rear wing) as an offline fallback.
+- **Real-sky HDRI** (Poly Haven, CC0) for the background + image-based lighting,
+  **AgX** tone mapping, and a **post-processing pipeline** — MSAA, bloom, and a
+  speed-driven radial blur / vignette / chromatic-aberration pass.
+- **Particle & surface FX** — tyre smoke on drift/handbrake, off-road dust,
+  high-speed dust streaks, and fading rear-tyre **skid marks**.
+- **A real 3D sports car** (Ferrari GLB) in clearcoat gunmetal paint that reflects
+  the HDRI sky — with a hand-built GT-R-Nismo-style coupe (quad round tail lights,
+  rear wing) as an offline fallback.
 - **Japanese countryside circuit**: asphalt with lane markings, guardrails,
   cherry-blossom + pine forest, **transmission pylons with catenary wires**, an
   elevated **shinkansen viaduct with a moving bullet train**, striped **tulip
@@ -92,9 +97,10 @@ src/
 ## 🛠️ Tech
 
 Vanilla JavaScript (ES modules) + [Three.js](https://threejs.org) `r160` (vendored).
-No framework, no bundler. The world, scenery, HUD and all textures are generated
-procedurally at runtime; the player car is a GLB model loaded with `GLTFLoader` +
-`DRACOLoader` over a `RoomEnvironment` IBL.
+No framework, no bundler. The world, scenery, HUD, particle FX and all textures are
+generated procedurally at runtime; the player car is a GLB model loaded with
+`GLTFLoader` + `DRACOLoader`, lit by an HDRI environment, and rendered through an
+`EffectComposer` post-processing chain (bloom + custom speed shader + AgX output).
 
 `three` and `playwright` in `devDependencies` are only used by the headless tests:
 
@@ -107,6 +113,8 @@ node test/browser.mjs   # real headless-Chromium render + screenshots (needs the
 
 - **3D car model** — `ferrari.glb` from the [three.js](https://github.com/mrdoob/three.js)
   examples (`examples/models/gltf/`); see the three.js repository for its asset license.
+- **Sky HDRI** — "Kloofendal 48d Partly Cloudy (Pure Sky)" from
+  [Poly Haven](https://polyhaven.com/a/kloofendal_48d_partly_cloudy_puresky) (CC0).
 - **Three.js** — © three.js authors, MIT License.
 - Reference: the *Forza Horizon 6* reveal trailer + stills. Unofficial,
   non-commercial fan project; all trademarks belong to their respective owners.

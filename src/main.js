@@ -11,6 +11,8 @@ import { ChaseCamera } from './camera.js';
 import { Input } from './input.js';
 import { HUD } from './hud.js';
 import { EngineAudio } from './audio.js';
+import { PostFX } from './postfx.js';
+import { FX } from './fx.js';
 import { clamp } from './util.js';
 
 const canvas = document.getElementById('scene');
@@ -23,7 +25,7 @@ const aspect = () => window.innerWidth / window.innerHeight;
 const delay = (ms) => new Promise((r) => setTimeout(r, ms));
 const setProgress = (p, t) => { bar.style.width = p + '%'; if (t) statusEl.textContent = t; };
 
-let world, track, scenery, traffic, car, chase, hud, input, audio;
+let world, track, scenery, traffic, car, chase, hud, input, audio, postfx, fx;
 let started = false;
 let introAngle = 0;
 
@@ -56,6 +58,13 @@ async function init() {
   chase = new ChaseCamera(aspect());
   hud = new HUD();
   audio = new EngineAudio();
+  fx = new FX(world.scene);
+  try {
+    postfx = new PostFX(world.renderer, world.scene, chase.cam);
+  } catch (e) {
+    console.warn('[main] post-processing unavailable, rendering direct:', (e && e.message) || e);
+    postfx = null;
+  }
   input = new Input({
     onCamera: () => started && chase.cycle(),
     onReset: () => started && car.reset(),
@@ -73,6 +82,8 @@ async function init() {
     started, mph: car.mph, speed: car.speed, gear: car.gearLabel,
     rpmFrac: car.rpmFrac, onRoad: car.onRoad, x: car.pos.x, z: car.pos.y,
     heading: car.heading, fov: chase.cam.fov, usingModel: car.usingModel,
+    fxParticles: fx ? fx.active : 0, skidWrites: fx ? fx.skidWrites : 0,
+    postfx: !!postfx, hdri: !!world.hdriLoaded,
   });
 
   addEventListener('resize', onResize);
@@ -93,6 +104,7 @@ function start() {
 function onResize() {
   world.resize();
   chase.resize(aspect());
+  if (postfx) postfx.setSize(window.innerWidth, window.innerHeight);
 }
 
 function frame() {
@@ -112,6 +124,7 @@ function frame() {
   if (started) {
     chase.update(dt, car);
     hud.update(car, track, dt);
+    fx.update(dt, car);
   } else {
     // slow cinematic orbit while the loader is up
     introAngle += dt * 0.22;
@@ -126,7 +139,9 @@ function frame() {
     chase.cam.updateProjectionMatrix();
   }
 
-  world.renderer.render(world.scene, chase.cam);
+  const speedFrac = started ? clamp(Math.abs(car.speed) / 92, 0, 1) : 0;
+  if (postfx) postfx.render(dt, speedFrac);
+  else world.renderer.render(world.scene, chase.cam);
 }
 
 startBtn.addEventListener('click', start);

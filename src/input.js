@@ -23,7 +23,8 @@ export class Input {
   get steer() {
     const l = this._left || this._tLeft;
     const r = this._right || this._tRight;
-    return (r ? 1 : 0) - (l ? 1 : 0);
+    // left key steers left (negative heading change handled in car.js)
+    return (l ? 1 : 0) - (r ? 1 : 0);
   }
 
   _key(e, down) {
